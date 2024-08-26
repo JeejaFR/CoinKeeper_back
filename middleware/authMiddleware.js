@@ -8,7 +8,7 @@ const authMiddleware = {
     next();
     return;
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Supposons que le token est passé comme "Bearer TOKEN"
+    const token = authHeader && authHeader.split(' ')[1];
   
     if (token == null) return res.status(401).json({ error: 'No token provided' });
   

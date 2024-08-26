@@ -4,23 +4,26 @@ const saltRounds = 10; // Nombre de rounds pour le hashage
 
 const userModel = {
   addUser: (user, callback) => {
-    const { username, password, email } = user;
+    const { password, email } = user;
+
+    const lowercasedEmail = email.toLowerCase();
     // Hashage du mot de passe
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
       if (err) return callback(err);
   
       const query = `
-        INSERT INTO users (username, password, email)
-        VALUES (?, ?, ?)
+        INSERT INTO users (password, email)
+        VALUES (?, ?)
       `;
-      db.run(query, [username, hashedPassword, email], function(err) {
+      db.run(query, [hashedPassword, lowercasedEmail], function(err) {
         callback(err, this.lastID);
       });
     });
   },
-  getUserByUsername: (username, callback) => {
-    const query = 'SELECT * FROM users WHERE username = ?';
-    db.get(query, [username], (err, row) => {
+  getUserByEmail: (email, callback) => {
+    const lowercasedEmail = email.toLowerCase();
+    const query = 'SELECT * FROM users WHERE email = ?';
+    db.get(query, [lowercasedEmail], (err, row) => {
       callback(err, row);
     });
   }

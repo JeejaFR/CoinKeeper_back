@@ -5,18 +5,19 @@ const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET_KEY;
 
 const userController = {
-  createUser: (req, res) => {
+  register: (req, res) => {
     const user = req.body;
     userModel.addUser(user, (err, id) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
-      res.status(201).json({ id });
+      const token = jwt.sign({ id: id, email: user.email }, secretKey, { expiresIn: '1h' });
+      res.status(201).json({ token });
     });
   },
-  authenticateUser: (req, res) => {
-    const { username, password } = req.body;
-    userModel.getUserByUsername(username, (err, user) => {
+  login: (req, res) => {
+    const { email, password } = req.body;
+    userModel.getUserByEmail(email, (err, user) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
@@ -33,7 +34,7 @@ const userController = {
         }
   
         // Générer un JWT
-        const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
         res.status(200).json({ token });
       });
     });
