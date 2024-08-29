@@ -8,12 +8,32 @@ const transactionModel = {
       return callback(new Error("Amount must be positive."));
     }
 
+    const transactionDescription = description ?? "";
+    const transactionDate = date ? new Date(date) : new Date();
+
+    const formattedDate = transactionDate.toISOString().split("T")[0];
+
     const query = `
       INSERT INTO transactions (amount, category, date, description, userID) 
       VALUES (?, ?, ?, ?, ?)
     `;
-    db.run(query, [amount, category, date, description, userID], function (err) {
-      callback(err, this.lastID);
+    db.run(query, [amount, category, formattedDate, transactionDescription, userID], function (err) {
+      if (err) {
+        return callback(err);
+      }
+
+      const transactionID = this.lastID;
+
+      const selectQuery = `
+        SELECT * FROM transactions WHERE id = ?
+      `;
+
+      db.get(selectQuery, [transactionID], (err, row) => {
+        if (err) {
+          return callback(err);
+        }
+        callback(null, row);
+      });
     });
   },
   getAllTransactions: (userID, callback) => {
@@ -25,6 +45,17 @@ const transactionModel = {
   getTransactionByID: (id, callback) => {
     const query = "SELECT * FROM transactions WHERE id=?";
     db.all(query, [id], (err, rows) => {
+      callback(err, rows);
+    });
+  },
+  getTransactionByPeriode: (userID, startDate, endDate, callback) => {
+    const query = `
+      SELECT * FROM transactions 
+      WHERE userID = ? 
+      AND date >= ? 
+      AND date <= ?
+    `;
+    db.all(query, [userID, startDate.toISOString(), endDate.toISOString()], (err, rows) => {
       callback(err, rows);
     });
   },
@@ -52,7 +83,10 @@ const transactionModel = {
     }
     if (date !== undefined) {
       updates.push("date = ?");
-      params.push(date);
+      const transactionDate = date ? new Date(date) : new Date();
+
+      const formattedDate = transactionDate.toISOString().split("T")[0];
+      params.push(formattedDate);
     }
     if (description !== undefined) {
       updates.push("description = ?");

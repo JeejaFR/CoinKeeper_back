@@ -22,7 +22,7 @@ const userController = {
         return res.status(500).json({ error: err.message });
       }
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'Utilisateur introuvable' });
       }
   
       bcrypt.compare(password, user.password, (err, result) => {
@@ -30,7 +30,7 @@ const userController = {
           return res.status(500).json({ error: err.message });
         }
         if (!result) {
-          return res.status(401).json({ message: 'Authentication failed' });
+          return res.status(401).json({ message: 'Echec de l\'authentification' });
         }
   
         // Générer un JWT

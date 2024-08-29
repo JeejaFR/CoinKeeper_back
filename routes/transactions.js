@@ -7,14 +7,17 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Route pour récupérer toutes les transactions de l'utilisateurs
 router.get('/', authMiddleware.isAuthenticated, transactionController.getAllTransactions);
 
-// Route pour récupérer une transaction par id TODO IS AUTHORIZED (savoir si c'est la sienne);
-router.get('/:id', authMiddleware.isAuthenticated, transactionController.getTransactionByID);
+// Route pour récupérer une transaction par id
+router.get('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, transactionController.getTransaction);
 
-// Route pour modifier une transaction par id TODO IS AUTHORIZED (savoir si c'est la sienne);
-router.put('/:id', authMiddleware.isAuthenticated, transactionController.updateTransactionByID);
+// route pour récupérer toutes les transactions de l'utilisateur pendant une période donnée.
+router.get('/periode/:periode', authMiddleware.isAuthenticated, transactionController.getTransactionByPeriode);
 
-// Route pour supprimer une transaction par id TODO IS AUTHORIZED (savoir si c'est la sienne);
-router.delete('/:id', authMiddleware.isAuthenticated, transactionController.deleteTransactionByID);
+// Route pour modifier une transaction par id
+router.put('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, transactionController.updateTransactionByID);
+
+// Route pour supprimer une transaction par id
+router.delete('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorized, transactionController.deleteTransactionByID);
 
 // Route pour créer une nouvelle transaction
 router.post('/', authMiddleware.isAuthenticated, transactionController.createTransaction);
