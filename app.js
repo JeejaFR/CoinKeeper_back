@@ -10,6 +10,8 @@ const cors = require('cors');
 
 var usersRouter = require('./routes/users');
 var transactionsRouter = require('./routes/transactions');
+var notificationsRouter = require('./routes/notifications');
+
 
 var app = express();
 
@@ -28,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('', usersRouter);
 app.use('/transactions', transactionsRouter);
-
+app.use('/notifications', notificationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const notificationModel = require('../models/notificationModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -12,7 +13,13 @@ const userController = {
         return res.status(500).json({ error: err.message });
       }
       const token = jwt.sign({ id: id, email: user.email }, secretKey, { expiresIn: '1h' });
-      res.status(201).json({ token });
+  
+      notificationModel.addNotification('Bienvenue sur CoinKeeper!', null, 1, id, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
+        }
+        res.status(201).json({ token });
+      });
     });
   },
   login: (req, res) => {

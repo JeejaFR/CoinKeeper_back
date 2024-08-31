@@ -16,3 +16,13 @@ CREATE TABLE IF NOT EXISTS transactions (
     userID INTEGER,
     FOREIGN KEY (userID) REFERENCES users(id)
 );
+
+-- Création de la table `notifications`
+CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    type INTEGER,
+    userID INTEGER,
+    FOREIGN KEY (userID) REFERENCES users(id)
+);
