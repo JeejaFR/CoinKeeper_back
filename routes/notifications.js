@@ -10,4 +10,7 @@ router.get('/', authMiddleware.isAuthenticated, notificationController.getNotifi
 // Route pour supprimer une notification par id
 router.delete('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorizedToAccessNotification, notificationController.deleteNotificationByID);
 
+// Route pour supprimer toutes les notifications de l'utilisateur
+router.delete('/', authMiddleware.isAuthenticated, notificationController.deleteAllNotifications);
+
 module.exports = router;

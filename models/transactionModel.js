@@ -62,17 +62,14 @@ const transactionModel = {
   editTransactionByID(id, transaction, callback) {
     const { amount, category, date, description } = transaction;
 
-    // Validation de amount si il est présent
     if (amount !== undefined && amount <= 0) {
       return callback(new Error("Amount must be positive."));
     }
 
-    // Construction de la requête SQL dynamique
     let query = "UPDATE transactions SET ";
     const updates = [];
     const params = [];
 
-    // Ajouter les champs modifiés à la requête
     if (amount !== undefined) {
       updates.push("amount = ?");
       params.push(amount);
@@ -101,7 +98,6 @@ const transactionModel = {
     query += " WHERE id = ?";
     params.push(id);
 
-    // Exécuter la requête SQL
     db.run(query, params, function (err) {
       if (err) {
         return callback(err);

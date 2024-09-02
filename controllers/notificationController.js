@@ -1,7 +1,7 @@
 const notificationModel = require("../models/notificationModel");
 
 
-const transactionController = {
+const categorieController = {
   getNotifications: (req, res) => {
     const userID = req.user.id;
     notificationModel.getAllNotifications(userID, (err, notifications) => {
@@ -33,6 +33,16 @@ const transactionController = {
       res.status(201).json({ id });
     });
   },
+  deleteAllNotifications: (req, res) => {
+    const userID = req.user.id;
+
+    notificationModel.deleteAllUserNotifications(userID, (err, id) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ id });
+    });
+  },
 };
 
-module.exports = transactionController;
+module.exports = categorieController;

@@ -22,5 +22,4 @@ router.delete('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorize
 // Route pour créer une nouvelle transaction
 router.post('/', authMiddleware.isAuthenticated, transactionController.createTransaction);
 
-
 module.exports = router;

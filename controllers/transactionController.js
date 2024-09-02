@@ -1,6 +1,6 @@
 const transactionModel = require("../models/transactionModel");
 const notificationModel = require("../models/notificationModel");
-
+const categorieController = require("../controllers/categorieController");
 
 const transactionController = {
   createTransaction: (req, res) => {
@@ -8,27 +8,30 @@ const transactionController = {
     const userID = req.user.id;
 
     if (transaction.amount <= 0) {
-      notificationModel.addNotification('Le montant doit être supérieur à 0', null, 1, userID, (err) => {
+      notificationModel.addNotification("Montant négatif", null, 1, userID, (err) => {
         if (err) {
           return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
         }
       });
       return res.status(401).send("Le montant doit être supérieur à 0");
     }
+
     transactionModel.addTransaction(transaction, userID, (err, newTransaction) => {
       if (err) {
-        notificationModel.addNotification('Erreur lors de la création de la transaction',null,2,userID, (err) => {
+        notificationModel.addNotification("Echec de la création", null, 2, userID, (err) => {
           if (err) {
             return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
           }
         });
         return res.status(500).json({ error: err.message });
       }
-      notificationModel.addNotification('Erreur lors de la création de la transaction',null,2,userID, (err) => {
+
+      notificationModel.addNotification("Transaction créée!", null, 0, userID, (err) => {
         if (err) {
           return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
         }
       });
+      categorieController.checkCategoryLimit(userID, transaction.category);
       res.status(201).json(newTransaction);
     });
   },
@@ -36,7 +39,7 @@ const transactionController = {
     const userID = req.user.id;
     transactionModel.getAllTransactions(userID, (err, transaction) => {
       if (err) {
-        notificationModel.addNotification('Erreur lors de la récupération des transactions', null , 0, userID, (err) => {
+        notificationModel.addNotification("Echec récupération transaction", null, 2, userID, (err) => {
           if (err) {
             return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
           }
@@ -74,24 +77,30 @@ const transactionController = {
     let endDate = new Date();
 
     switch (periode) {
-      case '0': // Cette semaine
+      case "0": // Cette semaine (lundi au dimanche)
         startDate = new Date();
-        startDate.setDate(endDate.getDate() - endDate.getDay());
+        const dayOfWeek = startDate.getDay();
+        const difference = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        startDate.setDate(startDate.getDate() - difference);
+        endDate.setDate(startDate.getDate() + 6);
         break;
-      case '1': // 2 dernières semaines
+      case "1": // 2 dernières semaines
         startDate = new Date();
         startDate.setDate(endDate.getDate() - (endDate.getDay() + 7));
         break;
-      case '2': // Ce mois-ci
+      case "2": // Ce mois-ci
         startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0); // Dernier jour du mois actuel
         break;
-      case '3': // 6 derniers mois
+      case "3": // 6 derniers mois
         startDate = new Date(endDate.getFullYear(), endDate.getMonth() - 5, 1);
         break;
-      case '4': // Cette année
+      case "4": // Cette année
         startDate = new Date(endDate.getFullYear(), 0, 1);
+        endDate.setMonth(11, 31); // 31 décembre
         break;
-      case '5':
+      case "5":
         transactionModel.getAllTransactions(userID, (err, transactions) => {
           if (err) {
             return res.status(500).json({ error: err.message });
@@ -100,7 +109,7 @@ const transactionController = {
         });
         return;
       default:
-        notificationModel.addNotification('Période invalide', null , 0, userID, (err) => {
+        notificationModel.addNotification("Période invalide", null, 0, userID, (err) => {
           if (err) {
             return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
           }
@@ -121,7 +130,7 @@ const transactionController = {
     const transaction = req.body;
 
     if (transaction.amount <= 0) {
-      notificationModel.addNotification('Le montant doit être supérieur à 0', null , 0, userID, (err) => {
+      notificationModel.addNotification("Le montant doit être supérieur à 0", null, 1, userID, (err) => {
         if (err) {
           return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
         }
@@ -131,14 +140,14 @@ const transactionController = {
 
     transactionModel.editTransactionByID(id, transaction, (err, id) => {
       if (err) {
-        notificationModel.addNotification('Erreur lors de l\'édition de la transaction', null , 0, userID, (err) => {
+        notificationModel.addNotification("Erreur lors de l'édition de la transaction", null, 2, userID, (err) => {
           if (err) {
             return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
           }
         });
         return res.status(500).json({ error: err.message });
       }
-      notificationModel.addNotification('Transaction modifiée!', null , 0, userID, (err) => {
+      notificationModel.addNotification("Transaction modifiée!", null, 0, userID, (err) => {
         if (err) {
           return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
         }
@@ -152,14 +161,14 @@ const transactionController = {
 
     transactionModel.deleteTransactionByID(id, (err, id) => {
       if (err) {
-        notificationModel.addNotification('Erreur lors de la suppresion de la transaction',null , 0, userID, (err) => {
+        notificationModel.addNotification("Erreur lors de la suppresion de la transaction", null, 2, userID, (err) => {
           if (err) {
             return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
           }
         });
         return res.status(500).json({ error: err.message });
       }
-      notificationModel.addNotification('Transaction supprimée!',null , 0, userID, (err) => {
+      notificationModel.addNotification("Transaction supprimée!", null, 0, userID, (err) => {
         if (err) {
           return res.status(500).json({ error: "Erreur lors de l'ajout de la notification" });
         }

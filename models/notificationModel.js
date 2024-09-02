@@ -3,7 +3,7 @@ const db = require("../db");
 const notificationModel = {
   addNotification: (content, date, type, userID, callback) => {
     const notificationDate = date ? new Date(date) : new Date();
-    const formattedDate = notificationDate.toISOString().split("T")[0];
+    const formattedDate = notificationDate.toISOString();
   
     const query = `
       INSERT INTO notifications (content, date, type, userID) 
@@ -37,6 +37,20 @@ const notificationModel = {
     }
 
     const query = "DELETE FROM notifications WHERE id = ?";
+
+    db.run(query, [id], function (err) {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, this.changes);
+    });
+  },
+  deleteAllUserNotifications: (id, callback) => {
+    if (!id || isNaN(id)) {
+      return callback(new Error("Invalid ID."));
+    }
+
+    const query = "DELETE FROM notifications WHERE userID = ?";
 
     db.run(query, [id], function (err) {
       if (err) {
