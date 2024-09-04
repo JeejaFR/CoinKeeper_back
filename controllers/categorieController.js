@@ -66,10 +66,10 @@ const categorieController = {
     // 1 MOIS
     const endDate = new Date();
     const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-    
+
     categorieModel.getCategorieByName(categoryName, userID, (err, category) => {
       if (err) {
-        console.log("erreur: "+err);
+        console.log("erreur: " + err);
         return;
       }
 

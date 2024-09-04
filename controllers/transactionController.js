@@ -100,7 +100,7 @@ const transactionController = {
         startDate = new Date(endDate.getFullYear(), 0, 1);
         endDate.setMonth(11, 31); // 31 décembre
         break;
-      case "5":
+      case "5": // Tout
         transactionModel.getAllTransactions(userID, (err, transactions) => {
           if (err) {
             return res.status(500).json({ error: err.message });
@@ -108,6 +108,37 @@ const transactionController = {
           return res.status(200).json(transactions);
         });
         return;
+      // Périodes décalées dans le passé
+      case "6": // Semaine dernière (lundi au dimanche)
+        startDate = new Date();
+        const dayOfWeekLast = startDate.getDay();
+        const differenceLast = dayOfWeekLast === 0 ? 6 : dayOfWeekLast - 1;
+        startDate.setDate(startDate.getDate() - differenceLast - 7);
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        break;
+      case "7": // 2 semaines avant les 2 dernières semaines
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - (startDate.getDay() + 21)); // Reculer de 3 semaines au total
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 13); // 2 semaines de plus
+        break;
+      case "8": // Mois dernier
+        startDate = new Date(endDate.getFullYear(), endDate.getMonth() - 1, 1);
+        endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 0); // Dernier jour du mois dernier
+        break;
+      case "9": // 6 mois avant les 6 derniers mois
+        startDate = new Date(endDate.getFullYear(), endDate.getMonth() - 11, 1);
+        endDate = new Date(endDate.getFullYear(), endDate.getMonth() - 6, 0); // Fin du mois avant 6 mois
+        break;
+      case "10": // Année dernière
+        startDate = new Date(endDate.getFullYear() - 1, 0, 1);
+        endDate = new Date(endDate.getFullYear() - 1, 11, 31); // 31 décembre de l'année dernière
+        break;
+      case "11": // Année avant l'année dernière
+        startDate = new Date(endDate.getFullYear() - 2, 0, 1);
+        endDate = new Date(endDate.getFullYear() - 2, 11, 31); // 31 décembre de l'année avant l'année dernière
+        break;
       default:
         notificationModel.addNotification("Période invalide", null, 0, userID, (err) => {
           if (err) {

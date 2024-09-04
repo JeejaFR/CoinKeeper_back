@@ -26,7 +26,7 @@ async function initCategories(userID) {
     await Promise.all(addCategoryPromises);
   } catch (error) {
     console.error("Erreur lors de l'ajout des catégories:", error);
-    throw error; // Rejeter l'erreur pour qu'elle puisse être attrapée dans la fonction appelante
+    throw error;
   }
 }
 
