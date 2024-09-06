@@ -15,7 +15,6 @@ const notificationModel = {
         console.log("Erreur lors de l'insertion de la notification : " + err.message);
         return callback(err);
       }
-      console.log("Notification ajoutée avec succès");
       callback(null, this.lastID);
     });
   },

@@ -63,9 +63,8 @@ const categorieController = {
     });
   },
   checkCategoryLimit(userID, categoryName) {
-    // 1 MOIS
     const endDate = new Date();
-    const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+    const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); // 1 MOIS
 
     categorieModel.getCategorieByName(categoryName, userID, (err, category) => {
       if (err) {

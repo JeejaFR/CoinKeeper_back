@@ -13,13 +13,13 @@ router.get('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorizedTo
 // route pour récupérer toutes les transactions de l'utilisateur pendant une période donnée.
 router.get('/periode/:periode', authMiddleware.isAuthenticated, transactionController.getTransactionByPeriode);
 
+// Route pour créer une nouvelle transaction
+router.post('/', authMiddleware.isAuthenticated, transactionController.createTransaction);
+
 // Route pour modifier une transaction par id
 router.put('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorizedToAccessTransaction, transactionController.updateTransactionByID);
 
 // Route pour supprimer une transaction par id
 router.delete('/:id', authMiddleware.isAuthenticated, authMiddleware.isAuthorizedToAccessTransaction, transactionController.deleteTransactionByID);
-
-// Route pour créer une nouvelle transaction
-router.post('/', authMiddleware.isAuthenticated, transactionController.createTransaction);
 
 module.exports = router;
